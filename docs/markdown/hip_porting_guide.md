@@ -7,7 +7,7 @@ and provides practical suggestions on how to port CUDA code and work through com
 
 <!-- toc -->
 
-- [Porting a New Cuda Project](#porting-a-new-cuda-project)
+- [Porting a New CUDA Project](#porting-a-new-cuda-project)
   * [General Tips](#general-tips)
   * [Scanning existing CUDA code to scope the porting effort](#scanning-existing-cuda-code-to-scope-the-porting-effort)
   * [Converting a project "in-place"](#converting-a-project-in-place)
@@ -48,12 +48,12 @@ and provides practical suggestions on how to port CUDA code and work through com
 
 <!-- tocstop -->
 
-## Porting a New Cuda Project
+## Porting a New CUDA Project
 
 ### General Tips
-- Starting the port on a Cuda machine is often the easiest approach, since you can incrementally port pieces of the code to HIP while leaving the rest in Cuda. (Recall that on Cuda machines HIP is just a thin layer over Cuda, so the two code types can interoperate on nvcc platforms.) Also, the HIP port can be compared with the original Cuda code for function and performance.
-- Once the Cuda code is ported to HIP and is running on the Cuda machine, compile the HIP code using hcc on an AMD machine.
-- HIP ports can replace Cuda versions---HIP can deliver the same performance as a native Cuda implementation, with the benefit of portability to both Nvidia and AMD architectures as well as a path to future C++ standard support. You can handle platform-specific features through conditional compilation or by adding them to the open-source HIP infrastructure.
+- Starting the port on a Cuda machine is often the easiest approach, since you can incrementally port pieces of the code to HIP while leaving the rest in CUDA. (Recall that on Cuda machines HIP is just a thin layer over CUDA, so the two code types can interoperate on nvcc platforms.) Also, the HIP port can be compared with the original CUDA code for function and performance.
+- Once the Cuda code is ported to HIP and is running on the CUDA machine, compile the HIP code using hcc on an AMD machine.
+- HIP ports can replace CUDA versions---HIP can deliver the same performance as a native CUDA implementation, with the benefit of portability to both Nvidia and AMD architectures as well as a path to future C++ standard support. You can handle platform-specific features through conditional compilation or by adding them to the open-source HIP infrastructure.
 - Use **bin/hipconvertinplace.sh** to hipify all code files in the Cuda source directory.
 
 ### Scanning existing CUDA code to scope the porting effort
@@ -149,7 +149,7 @@ Often, its useful to know whether the underlying compiler is hcc or nvcc. This
 ```
 #ifdef __NVCC__
 // Compiled with nvcc  
-//  Could be compiling with Cuda language extensions enabled (for example, a ".cu file)
+//  Could be compiling with CUDA language extensions enabled (for example, a ".cu file)
 //  Could be in pass-through mode to an underlying host compile OR (for example, a .cpp file)
  
 ```
@@ -204,7 +204,7 @@ Some Cuda code tests `__CUDA_ARCH__` for a specific value to determine whether t
 #if (__CUDA_ARCH__ >= 130) 
 // doubles are supported
 ```
-This type of code requires special attention, since hcc/AMD and nvcc/Cuda devices have different architectural capabilities. Moreover, you cant determine the presence of a feature using a simple comparison against an architectures version number. HIP provides a set of defines and device properties to query whether a specific architectural feature is supported.
+This type of code requires special attention, since hcc/AMD and nvcc/CUDA devices have different architectural capabilities. Moreover, you cant determine the presence of a feature using a simple comparison against an architectures version number. HIP provides a set of defines and device properties to query whether a specific architectural feature is supported.
 
 The `__HIP_ARCH_*` defines can replace comparisons of `__CUDA_ARCH__` values: 
 ```
@@ -330,7 +330,7 @@ hipcc adds -lm by default to the link command.
 
 ## Linking Code With Other Compilers
 
-Cuda code often uses nvcc for accelerator code (defining and launching kernels, typically defined in .cu or .cuh files). 
+CUDA code often uses nvcc for accelerator code (defining and launching kernels, typically defined in .cu or .cuh files). 
 It also uses a standard compiler (g++) for the rest of the application. nvcc is a preprocessor that employs a standard host compiler (e.g., gcc) to generate the host code. 
 Code compiled using this tool can employ only the intersection of language features supported by both nvcc and the host compiler. 
 In some cases, you must take care to ensure the data types and alignment of the host compiler are identical to those of the device compiler. Only some host compilers are supported---for example, recent nvcc versions lack Clang host-compiler capability.  
@@ -363,7 +363,7 @@ The hip_runtime.h and hip_runtime_api.h files define the types, functions and en
 - hip_runtime_api.h: defines all the HIP runtime APIs (e.g., hipMalloc) and the types required to call them. A source file that is only calling HIP APIs but neither defines nor launches any kernels can include hip_runtime_api.h. hip_runtime_api.h uses no custom hc language features and can be compiled using a standard C++ compiler.
 - hip_runtime.h: included in hip_runtime_api.h. It additionally provides the types and defines required to create and launch kernels. hip_runtime.h does use custom hc language features, but they are guarded by ifdef checks. It can be compiled using a standard C++ compiler but will expose a subset of the available functions.
 
-Cuda has slightly different contents for these two files. In some cases you may need to convert hipified code to include the richer hip_runtime.h instead of hip_runtime_api.h.
+CUDA has slightly different contents for these two files. In some cases you may need to convert hipified code to include the richer hip_runtime.h instead of hip_runtime_api.h.
 
 ### Using a Standard C++ Compiler
 You can compile hip\_runtime\_api.h using a standard C or C++ compiler (e.g., gcc or ICC). The HIP include paths and defines (`__HIP_PLATFORM_HCC__` or `__HIP_PLATFORM_NVCC__`) must pass to the standard compiler; hipconfig then returns the necessary options:
@@ -390,7 +390,7 @@ The hcc path provides an empty cuda.h file. Some existing Cuda programs include 
 
 ### Choosing HIP File Extensions
 
-Many existing Cuda projects use the ".cu" and ".cuh" file extensions to indicate code that should be run through the nvcc compiler. 
+Many existing CUDA projects use the ".cu" and ".cuh" file extensions to indicate code that should be run through the nvcc compiler. 
 For quick HIP ports, leaving these file extensions unchanged is often easier, as it minimizes the work required to change file names in the directory and #include statements in the files.
 
 For new projects or ports which can be re-factored, we recommend the use of the extension ".hip.cpp" for header files, and
@@ -515,7 +515,7 @@ Additionally, many of the Rodinia benchmarks demonstrate how to modify hipified 
 For example, [here
 
 
-Cuda programs that employ sampler hardware must either wait for hcc texture support or use more-sophisticated workarounds.
+CUDA programs that employ sampler hardware must either wait for hcc texture support or use more-sophisticated workarounds.
 
 ## More Tips
 ### HIPTRACE Mode
